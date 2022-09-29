@@ -2,6 +2,7 @@ import os
 import requests
 
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 load_dotenv()
 
@@ -35,5 +36,11 @@ res = requests.get("https://oauth.reddit.com/r/EarthPorn/top",
 
 for post in res.json()['data']['children']:
     title = post['data']['title']
-    image_url = post['data']['url_overridden_by_dest']
-    print(title, image_url)
+    img_url = post['data']['url_overridden_by_dest']
+
+    img_name = os.path.basename(urlparse(img_url).path)
+    img_data = requests.get(img_url).content
+
+    # Download with requests
+    with open(img_name, 'wb') as handler:
+        handler.write(img_data)
