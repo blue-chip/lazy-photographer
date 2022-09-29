@@ -32,7 +32,7 @@ requests.get('https://oauth.reddit.com/api/v1/me', headers=headers)
 
 res = requests.get("https://oauth.reddit.com/r/EarthPorn/top",
                    headers=headers,
-                   params={'limit':'10'})
+                   params={'limit':'10', 't':'week'})
 
 for post in res.json()['data']['children']:
     title = post['data']['title']
@@ -41,6 +41,5 @@ for post in res.json()['data']['children']:
     img_name = os.path.basename(urlparse(img_url).path)
     img_data = requests.get(img_url).content
 
-    # Download with requests
     with open(img_name, 'wb') as handler:
         handler.write(img_data)
