@@ -1,3 +1,5 @@
+import boto3
+import datetime
 import os
 import requests
 
@@ -34,6 +36,10 @@ res = requests.get("https://oauth.reddit.com/r/EarthPorn/top",
                    headers=headers,
                    params={'limit':'10', 't':'week'})
 
+s3 = boto3.client('s3')
+bucket = 'lazyphotographer'
+var_now = datetime.datetime.now().strftime('%Y%m%d')
+
 for post in res.json()['data']['children']:
     title = post['data']['title']
     img_url = post['data']['url_overridden_by_dest']
@@ -41,5 +47,8 @@ for post in res.json()['data']['children']:
     img_name = os.path.basename(urlparse(img_url).path)
     img_data = requests.get(img_url).content
 
-    with open(img_name, 'wb') as handler:
-        handler.write(img_data)
+    key = 'photos/' + var_now + '/' + img_name
+
+    s3.put_object(Bucket=bucket,
+                  Key=key,
+                  Body=img_data)
